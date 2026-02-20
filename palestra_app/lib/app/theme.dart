@@ -1,18 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// ─── Dark palette ────────────────────────────────────────────────────────────
 class AppTheme {
-  static const Color background = Color(0xFF0D0D1A);
-  static const Color surface = Color(0xFF13132A);
-  static const Color surfaceVariant = Color(0xFF1C1C38);
+  // Shared accent colors (same in both themes)
   static const Color accent = Color(0xFF6C63FF);
   static const Color accentLight = Color(0xFF9B94FF);
   static const Color secondary = Color(0xFFFF6584);
   static const Color tertiary = Color(0xFF43D9AD);
+
+  // Dark-specific
+  static const Color background = Color(0xFF0D0D1A);
+  static const Color surface = Color(0xFF13132A);
+  static const Color surfaceVariant = Color(0xFF1C1C38);
   static const Color textPrimary = Color(0xFFF0F0FF);
   static const Color textSecondary = Color(0xFF9090B0);
   static const Color codeBackground = Color(0xFF0A0A18);
   static const Color codeBorder = Color(0xFF2A2A50);
+
+  // Light-specific
+  static const Color lightBackground = Color(0xFFF5F4FF);
+  static const Color lightSurface = Color(0xFFFFFFFF);
+  static const Color lightSurfaceVariant = Color(0xFFEEEDFF);
+  static const Color lightTextPrimary = Color(0xFF1A1A2E);
+  static const Color lightTextSecondary = Color(0xFF6B6B80);
+  static const Color lightCodeBackground = Color(0xFF1E1E3F);
+  static const Color lightCodeBorder = Color(0xFFD8D6FF);
 
   static ThemeData get dark => ThemeData(
     brightness: Brightness.dark,
@@ -83,4 +96,93 @@ class AppTheme {
     dividerTheme: const DividerThemeData(color: codeBorder, thickness: 1),
     useMaterial3: true,
   );
+
+  static ThemeData get light => ThemeData(
+    brightness: Brightness.light,
+    scaffoldBackgroundColor: lightBackground,
+    colorScheme: const ColorScheme.light(
+      primary: accent,
+      secondary: secondary,
+      tertiary: tertiary,
+      surface: lightSurface,
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      onSurface: lightTextPrimary,
+    ),
+    textTheme: GoogleFonts.interTextTheme(
+      ThemeData.light().textTheme,
+    ).apply(bodyColor: lightTextPrimary, displayColor: lightTextPrimary),
+    appBarTheme: AppBarTheme(
+      backgroundColor: lightSurface,
+      elevation: 0,
+      titleTextStyle: GoogleFonts.inter(
+        color: lightTextPrimary,
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: lightSurface,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+        side: BorderSide(color: lightCodeBorder, width: 1),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: accent,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: lightSurfaceVariant,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: lightCodeBorder),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: lightCodeBorder),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: accent, width: 2),
+      ),
+      labelStyle: const TextStyle(color: lightTextSecondary),
+    ),
+    checkboxTheme: CheckboxThemeData(
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return accent;
+        return lightSurfaceVariant;
+      }),
+      side: const BorderSide(color: lightTextSecondary),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+    ),
+    dividerTheme: const DividerThemeData(color: lightCodeBorder, thickness: 1),
+    useMaterial3: true,
+  );
+
+  // ─── Helpers to read theme-aware colors from context ─────────────────────
+  static bool isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
+  static Color bg(BuildContext context) =>
+      isDark(context) ? background : lightBackground;
+  static Color surf(BuildContext context) =>
+      isDark(context) ? surface : lightSurface;
+  static Color surfVar(BuildContext context) =>
+      isDark(context) ? surfaceVariant : lightSurfaceVariant;
+  static Color textPri(BuildContext context) =>
+      isDark(context) ? textPrimary : lightTextPrimary;
+  static Color textSec(BuildContext context) =>
+      isDark(context) ? textSecondary : lightTextSecondary;
+  static Color codeBg(BuildContext context) =>
+      isDark(context) ? codeBackground : lightCodeBackground;
+  static Color border(BuildContext context) =>
+      isDark(context) ? codeBorder : lightCodeBorder;
 }

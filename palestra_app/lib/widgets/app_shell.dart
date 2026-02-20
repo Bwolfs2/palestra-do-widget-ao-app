@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../app/theme.dart';
+import '../app/theme_notifier.dart';
 
 class NavItem {
   final String label;
@@ -74,7 +75,7 @@ class AppShell extends StatelessWidget {
     final isWide = MediaQuery.of(context).size.width > 900;
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.bg(context),
       body: Row(
         children: [
           if (isWide) _Sidebar(currentLocation: location),
@@ -100,9 +101,9 @@ class _Sidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 240,
-      decoration: const BoxDecoration(
-        color: AppTheme.surface,
-        border: Border(right: BorderSide(color: AppTheme.codeBorder)),
+      decoration: BoxDecoration(
+        color: AppTheme.surf(context),
+        border: Border(right: BorderSide(color: AppTheme.border(context))),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +181,11 @@ class _Sidebar extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+            child: _ThemeToggle(),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
             child: Text(
               'Vilson Dauinheimer\n[ Bwolf ]',
               style: GoogleFonts.inter(
@@ -291,9 +296,9 @@ class _TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 60,
-      decoration: const BoxDecoration(
-        color: AppTheme.surface,
-        border: Border(bottom: BorderSide(color: AppTheme.codeBorder)),
+      decoration: BoxDecoration(
+        color: AppTheme.surf(context),
+        border: Border(bottom: BorderSide(color: AppTheme.border(context))),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -361,6 +366,54 @@ class _NavChip extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ThemeToggle extends StatelessWidget {
+  const _ThemeToggle();
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeNotifier.instance,
+      builder: (context, mode, _) {
+        final isDark = mode == ThemeMode.dark;
+        final fg = isDark ? AppTheme.textPrimary : AppTheme.lightTextPrimary;
+        final bg = isDark ? AppTheme.surfaceVariant : AppTheme.lightSurfaceVariant;
+        final bd = isDark ? AppTheme.codeBorder : AppTheme.lightCodeBorder;
+        return GestureDetector(
+          onTap: ThemeNotifier.instance.toggle,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10), border: Border.all(color: bd)),
+            child: Row(children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                    key: ValueKey(isDark), size: 16, color: isDark ? AppTheme.accentLight : AppTheme.accent),
+              ),
+              const SizedBox(width: 8),
+              Text(isDark ? 'Tema Dark' : 'Tema Light',
+                  style: GoogleFonts.inter(color: fg, fontSize: 12, fontWeight: FontWeight.w600)),
+              const Spacer(),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: 32, height: 18, padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(color: isDark ? AppTheme.accent : AppTheme.lightCodeBorder, borderRadius: BorderRadius.circular(9)),
+                child: AnimatedAlign(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  alignment: isDark ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(width: 14, height: 14, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
+                ),
+              ),
+            ]),
+          ),
+        );
+      },
     );
   }
 }
