@@ -47,8 +47,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(40),
+      padding: EdgeInsets.all(isMobile ? 16 : 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -67,8 +68,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildHero(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
     return Container(
-      padding: const EdgeInsets.all(40),
+      padding: EdgeInsets.all(isMobile ? 20 : 40),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF1A1A3E), Color(0xFF0D0D1A)],
@@ -78,76 +80,126 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppTheme.codeBorder),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: isMobile
+          ? _buildHeroContent(context, isMobile: true)
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.accent.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: AppTheme.accent.withValues(alpha: 0.4),
-                    ),
-                  ),
-                  child: Text(
-                    'Flutter Palestra',
-                    style: GoogleFonts.firaCode(
-                      color: AppTheme.accentLight,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Do Widget\nao App',
-                  style: GoogleFonts.inter(
-                    color: AppTheme.textPrimary,
-                    fontSize: 48,
-                    fontWeight: FontWeight.w800,
-                    height: 1.1,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Entenda estado no Flutter: de setState a BLoC.\nExemplos interativos, código ao vivo.',
-                  style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
-                    fontSize: 16,
-                    height: 1.6,
-                  ),
-                ),
-                const SizedBox(height: 28),
-                ElevatedButton.icon(
-                  onPressed: () => context.go('/lifecycle'),
-                  icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text('Começar'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 28,
-                      vertical: 16,
-                    ),
-                    textStyle: GoogleFonts.inter(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
+                Expanded(child: _buildHeroContent(context, isMobile: false)),
+                const SizedBox(width: 32),
+                _buildFlutterLogo(),
               ],
             ),
+    );
+  }
+
+  Widget _buildHeroContent(BuildContext context, {required bool isMobile}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (isMobile)
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.accent.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppTheme.accent.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Text(
+                  'Flutter Palestra',
+                  style: GoogleFonts.firaCode(
+                    color: AppTheme.accentLight,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              // Small logo on mobile
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppTheme.accent.withValues(alpha: 0.3),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.flutter_dash,
+                    size: 34,
+                    color: AppTheme.accent,
+                  ),
+                ),
+              ),
+            ],
+          )
+        else
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppTheme.accent.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTheme.accent.withValues(alpha: 0.4)),
+            ),
+            child: Text(
+              'Flutter Palestra',
+              style: GoogleFonts.firaCode(
+                color: AppTheme.accentLight,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-          const SizedBox(width: 32),
-          _buildFlutterLogo(),
-        ],
-      ),
+        const SizedBox(height: 20),
+        Text(
+          'Do Widget\nao App',
+          style: GoogleFonts.inter(
+            color: AppTheme.textPrimary,
+            fontSize: isMobile ? 32 : 48,
+            fontWeight: FontWeight.w800,
+            height: 1.1,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          isMobile
+              ? 'Entenda estado no Flutter:\nde setState a BLoC.'
+              : 'Entenda estado no Flutter: de setState a BLoC.\nExemplos interativos, código ao vivo.',
+          style: GoogleFonts.inter(
+            color: AppTheme.textSecondary,
+            fontSize: isMobile ? 14 : 16,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 28),
+        ElevatedButton.icon(
+          onPressed: () => context.go('/lifecycle'),
+          icon: const Icon(Icons.play_arrow_rounded),
+          label: const Text('Começar'),
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 20 : 28,
+              vertical: isMobile ? 12 : 16,
+            ),
+            textStyle: GoogleFonts.inter(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -240,8 +292,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildTopicCardWidget(BuildContext context, _TopicCard t) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    // On mobile: full width. On tablet: min 260. On desktop: fixed 280.
+    final cardWidth = isMobile ? double.infinity : 280.0;
     return SizedBox(
-      width: 280,
+      width: cardWidth,
       child: _HoverCard(
         onTap: () => context.go(t.route),
         child: Container(
